@@ -1,0 +1,31 @@
+{
+  "name": "apimichistema",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "commonjs",
+  
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.ts",
+    "dev": "nodemon --exec ts-node app.ts",
+    "migrate": "cd ./db && npx sequelize-cli db:migrate",
+    "create:migration": "cd ./db && npx sequelize-cli migration:generate --name",
+    "create:seed": "cd ./db && npx sequelize-cli seed:generate --name",
+    "migrate:undo": "cd ./db && npx sequelize-cli db:migrate:undo",
+    "seed:undo": "cd ./db && npx sequelize-cli db:seed:undo",
+    "seed:all": "cd ./db && npx sequelize-cli db:seed:all"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.13.0",
+    "sequelize": "^6.37.6",
+    "twilio": "^5.4.5"
+  }
+}

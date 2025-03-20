@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "target": "es2015", // Especifica la versión de ECMAScript a la que se compilará el código
+        "module": "commonjs", // Especifica el módulo de salida
+        "outDir": "./dist", // Directorio donde se generarán los archivos JavaScript compilados
+        "strict": false, // Activa las comprobaciones de tipo más estrictas
+        "esModuleInterop": true // Permite la interoperabilidad entre módulos CommonJS y ES Modules
+    }
+}
