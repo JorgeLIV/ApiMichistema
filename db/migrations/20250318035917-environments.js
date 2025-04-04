@@ -17,14 +17,15 @@ module.exports = {
         type: Sequelize.DataTypes.STRING(100),
         allowNull: true,
       },
-      user_device_id: {
+      user_id: { // Relaciona el entorno con un usuario
         type: Sequelize.DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: false, // Un entorno siempre debe pertenecer a un usuario
         references: {
-          model: 'user_device',
+          model: 'users',
           key: 'id',
         },
-        onDelete: 'SET NULL',
+        onDelete: 'CASCADE', // Si se elimina el usuario, se eliminan sus entornos
+        onUpdate: 'CASCADE',
       },
       active: {
         type: Sequelize.DataTypes.BOOLEAN,

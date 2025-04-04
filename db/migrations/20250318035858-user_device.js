@@ -25,12 +25,13 @@ module.exports = {
       },
       user_id: {
         type: Sequelize.DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: false,
         references: {
           model: 'users',
           key: 'id',
         },
-        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT',
       },
       device_id: {
         type: Sequelize.DataTypes.INTEGER,
@@ -40,6 +41,7 @@ module.exports = {
           key: 'id',
         },
         onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
       },
       active: {
         type: Sequelize.DataTypes.BOOLEAN,

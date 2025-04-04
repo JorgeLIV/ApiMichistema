@@ -110,6 +110,53 @@ export default class UserController {
     }
   }
 
+  static async getCurrentUser(req: Request, res: Response) {
+    try {
+      // Obtener el token del encabezado de la solicitud
+      const token = req.header('Authorization')?.replace('Bearer ', '');
+  
+      if (!token) {
+        return res.status(401).json({
+          status: 401,
+          message: 'No se proporcionó un token de autenticación.',
+        });
+      }
+  
+      // Verificar y decodificar el token
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as jwt.JwtPayload;
+  
+      // Buscar el usuario basado en el correo (o cualquier otro dato que decodifiques del token)
+      const user = await User.findOne({ where: { email: decoded.email }, paranoid: false });
+  
+      if (!user) {
+        return res.status(404).json({
+          status: 404,
+          message: 'Usuario no encontrado.',
+        });
+      }
+  
+      return res.status(200).json({
+        status: 200,
+        message: 'Usuario encontrado.',
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role_id: user.role_id,
+          // Agrega más datos que consideres necesarios
+        },
+      });
+    } catch (error) {
+      console.error('Error al obtener el usuario con sesión activa:', error);
+      return res.status(500).json({
+        status: 500,
+        message: 'Error al obtener el usuario con sesión activa.',
+        error: error.message,
+      });
+    }
+  }
+  
+  
   static async updateUser(req: Request, res: Response) {
     try {
       const { id } = req.params;

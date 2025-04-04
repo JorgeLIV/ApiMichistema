@@ -1,35 +1,45 @@
 import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
 require('dotenv').config();
 
+// Define the attributes interface
 interface StatsAttributes {
   id: number;
-  user_device_id?: number | null;
+  userDeviceId?: number | null; // Changed to camelCase for consistency
   title: string;
   message: string;
   value: string;
-  recorded_at: Date;
+  recordedAt: Date; // Changed to camelCase
   createdAt: Date;
   updatedAt: Date;
 }
 
-interface StatsCreationAttributes extends Optional<StatsAttributes, 'id' | 'user_device_id'> {}
+// Define creation attributes with optional fields
+interface StatsCreationAttributes extends Optional<StatsAttributes, 'id' | 'userDeviceId'> {}
 
+// Define the Stats class
 class Stats extends Model<StatsAttributes, StatsCreationAttributes> implements StatsAttributes {
   public id!: number;
-  public user_device_id?: number | null;
+  public userDeviceId?: number | null; // Changed to camelCase
   public title!: string;
   public message!: string;
   public value!: string;
-  public recorded_at!: Date;
+  public recordedAt!: Date; // Changed to camelCase
   public createdAt!: Date;
   public updatedAt!: Date;
 }
 
-const sequelize = new Sequelize(process.env.DB_NAME!, process.env.DB_USERNAME!, process.env.DB_PASSWORD!, {
-  dialect: 'mysql',
-  host: process.env.DB_HOST,
-});
+// Initialize Sequelize instance
+const sequelize = new Sequelize(
+  process.env.DB_NAME!,
+  process.env.DB_USERNAME!,
+  process.env.DB_PASSWORD!,
+  {
+    dialect: 'mysql',
+    host: process.env.DB_HOST,
+  }
+);
 
+// Initialize the Stats model
 Stats.init(
   {
     id: {
@@ -37,7 +47,7 @@ Stats.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    user_device_id: {
+    userDeviceId: { // Changed to camelCase
       type: DataTypes.INTEGER,
       allowNull: true,
     },
@@ -53,7 +63,7 @@ Stats.init(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    recorded_at: {
+    recordedAt: { // Changed to camelCase
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),

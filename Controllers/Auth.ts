@@ -92,21 +92,28 @@ export default class AuthController {
     }
   }
 
+  
   static async logoutUser(req: Request, res: Response) {
     try {
-      const userId = req.body.id;
-      const user = await User.findByPk(userId);
+      const authHeader = req.headers.authorization;
+      if (!authHeader) {
+        return res.status(401).json({ status: 401, message: 'No se proporcionó un token.' });
+      }
+  
+      const token = authHeader.split(' ')[1];
+  
+      const user = await User.findOne({ where: { jwt_token: token } });
       if (!user) {
         return res.status(404).json({ status: 404, message: 'Usuario no encontrado.' });
       }
-
-      user.jwt_token = null;
+  
+      user.jwt_token = null; // Invalidamos el token almacenado
       await user.save();
-
+  
       return res.status(200).json({ status: 200, message: 'Sesión cerrada correctamente.' });
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
       return res.status(500).json({ status: 500, message: 'Error al cerrar sesión.', error: error.message });
     }
+  }  
   }
-}

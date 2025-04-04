@@ -1,6 +1,13 @@
-import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
-require('dotenv').config();
+import { 
+  DataTypes, 
+  Model, 
+  Optional, 
+  HasManyGetAssociationsMixin,
+  HasManyAddAssociationMixin
+} from 'sequelize';
+import sequelize from '../db'; // Importa la instancia centralizada desde db.ts
 
+// Interfaces para los atributos
 interface DeviceAttributes {
   id: number;
   name: string;
@@ -13,9 +20,14 @@ interface DeviceAttributes {
   deletedAt?: Date | null;
 }
 
-interface DeviceCreationAttributes extends Optional<DeviceAttributes, 'id' | 'description' | 'code' | 'constant' | 'deletedAt'> {}
+interface DeviceAttributesWithIncludes extends DeviceAttributes {
+  userDevices?: UserDevice[]; // Asociación con UserDevice
+}
 
-class Device extends Model<DeviceAttributes, DeviceCreationAttributes> implements DeviceAttributes {
+interface DeviceCreationAttributes extends Optional<DeviceAttributes, 'id' | 'description' | 'code' | 'constant' | 'deletedAt' | 'createdAt' | 'updatedAt'> {}
+
+// Clase del modelo
+export class Device extends Model<DeviceAttributesWithIncludes, DeviceCreationAttributes> implements DeviceAttributes {
   public id!: number;
   public name!: string;
   public description?: string | null;
@@ -25,12 +37,28 @@ class Device extends Model<DeviceAttributes, DeviceCreationAttributes> implement
   public createdAt!: Date;
   public updatedAt!: Date;
   public deletedAt?: Date | null;
-}
 
-const sequelize = new Sequelize(process.env.DB_NAME!, process.env.DB_USERNAME!, process.env.DB_PASSWORD!, {
-  dialect: 'mysql',
-  host: process.env.DB_HOST,
-});
+  // Propiedad de la asociación
+  public userDevices?: UserDevice[];
+
+  // Mixins para las asociaciones
+  public getUserDevices!: HasManyGetAssociationsMixin<UserDevice>;
+  public addUserDevice!: HasManyAddAssociationMixin<UserDevice, number>;
+
+  // Método estático para definir asociaciones
+  public static associate(models: {
+    UserDevice: typeof UserDevice;
+    // Añade otros modelos relacionados si los tienes
+  }) {
+    console.log('Configurando asociaciones en Device'); // Depuración
+    Device.hasMany(models.UserDevice, {
+      foreignKey: 'device_id',
+      as: 'userDevices',
+      onDelete: 'SET NULL', // Coincide con UserDevice
+      onUpdate: 'CASCADE',
+    });
+  }
+}
 
 Device.init(
   {
@@ -64,12 +92,12 @@ Device.init(
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      defaultValue: DataTypes.NOW, // Cambié a DataTypes.NOW para consistencia
     },
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
+      defaultValue: DataTypes.NOW, // Cambié a DataTypes.NOW
     },
     deletedAt: {
       type: DataTypes.DATE,
@@ -84,5 +112,8 @@ Device.init(
     paranoid: true,
   }
 );
+
+// Tipo básico para UserDevice (debería estar en su propio archivo)
+export class UserDevice extends Model {}
 
 export default Device;

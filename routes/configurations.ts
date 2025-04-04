@@ -10,11 +10,11 @@ const routes = express.Router();
 console.log("Rutas de configuraciones cargadas correctamente");
 
 
-routes.get('/configurations', ConfigurationsController.getAll);
-routes.get('/configurations/:id', ConfigurationsController.getById);
-routes.post('/configurations', ConfigurationsController.create);
-routes.put('/configurations/:id', ConfigurationsController.update);
-routes.delete('/configurations/:id', ConfigurationsController.delete);
+routes.get('/', ConfigurationsController.getAll);
+routes.get('/:id', ConfigurationsController.getById);
+routes.post('/', ConfigurationsController.create);
+routes.put('/:id', ConfigurationsController.update);
+routes.delete('/:id', ConfigurationsController.delete);
 
 
 export default routes;

@@ -10,5 +10,7 @@ routes.get("/",  UserController.getUsers);
 routes.get("/:id",  UserController.getUserById);
 routes.put("/:id",  UserController.updateUser);
 routes.delete("/:id",  UserController.deleteUser);
+routes.get("/me",  UserController.getCurrentUser);
+
 
 export default routes;

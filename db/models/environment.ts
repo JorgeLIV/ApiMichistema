@@ -1,32 +1,70 @@
-import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
-require('dotenv').config();
+// db/models/environment.ts
+import { 
+  DataTypes, 
+  Model, 
+  Optional, 
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
+  HasManyGetAssociationsMixin,
+  HasManyAddAssociationMixin
+} from 'sequelize';
+import sequelize from '../db';
 
 interface EnvironmentAttributes {
   id: number;
   name: string;
   color?: string | null;
-  user_device_id?: number | null;
+  user_id: number;
   active: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
-interface EnvironmentCreationAttributes extends Optional<EnvironmentAttributes, 'id' | 'color' | 'user_device_id'> {}
+interface EnvironmentAttributesWithIncludes extends EnvironmentAttributes {
+  user?: User;
+  userDevices?: UserDevice[];
+}
 
-class Environment extends Model<EnvironmentAttributes, EnvironmentCreationAttributes> implements EnvironmentAttributes {
+interface EnvironmentCreationAttributes extends Optional<EnvironmentAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
+
+export class Environment extends Model<EnvironmentAttributesWithIncludes, EnvironmentCreationAttributes> 
+  implements EnvironmentAttributes {
   public id!: number;
   public name!: string;
   public color?: string | null;
-  public user_device_id?: number | null;
+  public user_id!: number;
   public active!: boolean;
   public createdAt!: Date;
   public updatedAt!: Date;
-}
 
-const sequelize = new Sequelize(process.env.DB_NAME!, process.env.DB_USERNAME!, process.env.DB_PASSWORD!, {
-  dialect: 'mysql',
-  host: process.env.DB_HOST,
-});
+  public user?: User;
+  public userDevices?: UserDevice[];
+
+  public getUser!: BelongsToGetAssociationMixin<User>;
+  public setUser!: BelongsToSetAssociationMixin<User, number>;
+  public getUserDevices!: HasManyGetAssociationsMixin<UserDevice>;
+  public addUserDevice!: HasManyAddAssociationMixin<UserDevice, number>;
+
+  public static associate(models: {
+    User: typeof User;
+    UserDevice: typeof UserDevice;
+  }) {
+    console.log('Configurando asociaciones en Environment');
+    Environment.belongsTo(models.User, {
+      foreignKey: 'user_id',
+      as: 'user',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+
+    Environment.hasMany(models.UserDevice, {
+      foreignKey: 'environment_id',
+      as: 'userDevices',
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+    });
+  }
+}
 
 Environment.init(
   {
@@ -43,9 +81,9 @@ Environment.init(
       type: DataTypes.STRING(100),
       allowNull: true,
     },
-    user_device_id: {
+    user_id: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
     },
     active: {
       type: DataTypes.BOOLEAN,
@@ -55,10 +93,12 @@ Environment.init(
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
   },
   {
@@ -68,5 +108,8 @@ Environment.init(
     timestamps: true,
   }
 );
+
+export class User extends Model {}
+export class UserDevice extends Model {}
 
 export default Environment;
